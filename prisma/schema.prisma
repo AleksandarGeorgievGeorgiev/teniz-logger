@@ -13,18 +13,53 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id          String   @id @default(uuid())
-  firstName   String?
-  lastName    String?
-  email       String
-  phoneNumber String   @unique
-  difficultyLevel PlayerLevel
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Player {
+  id              String           @id @default(uuid())
+  firstName       String?
+  lastName        String?
+  email           String
+  phoneNumber     String           @unique
+  difficultyLevel PlayerLevel?
+  trainingPlayer  TrainingPlayer[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model Coach {
+  id        String     @id @default(uuid())
+  firstName String?
+  lastName  String?
+  email     String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  Trainings Training[]
+}
+
+model Training {
+  id             String           @id @default(uuid())
+  level          PlayerLevel
+  court          Int
+  date           DateTime
+  time           DateTime
+  coach          Coach            @relation(fields: [coachId], references: [id])
+  coachId        String
+  trainingPlayer TrainingPlayer[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model TrainingPlayer {
+  id         String   @id @default(uuid())
+  training   Training @relation(fields: [trainingId], references: [id])
+  trainingId String
+  player     Player   @relation(fields: [playerId], references: [id])
+  playerId   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 enum PlayerLevel {
   BEGINNER
   INTERMEDIATE
+  PRO
 }
